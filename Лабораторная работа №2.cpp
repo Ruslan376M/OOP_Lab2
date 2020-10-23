@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <locale.h>
 
 class CelestialBody
 {
@@ -7,6 +8,11 @@ public:
     double volume; // В кубических километрах
     double rotationPeriod; // В сутках
     
+    virtual void message()
+    {
+        printf("This is a body\n");
+    }
+
     CelestialBody()
     {
         mass = 0;
@@ -131,7 +137,7 @@ public:
         printf("Moon()\n");
     }
 
-    void message()
+    virtual void message()
     {
         printf("This body is а moon called %s\n", moonName.c_str());
     }
@@ -167,16 +173,23 @@ public:
     std::string planetName;
     bool canBeHabitable;// Пригодна ли для жизни
 
-    void message()
+    virtual void message()
     {
         printf("This is а planet called %s\n", planetName.c_str());
+    }
+
+    void addMoon(const Moon& moon)
+    {
+        this->moon[numberOfMoons] = new Moon(moon);
+        numberOfMoons++;
+        printf("Added moon called %s\n", moon.moonName.c_str());
     }
 
     Planet()
     {
         planetName = "";
         canBeHabitable = false;
-        printf("Planet()");
+        printf("Planet()\n");
     }
 
     Planet(double mass, double volume, double rotationPeriod, std::string galaxyName, std::string planetarySystemName, std::string planetName, bool canBeHabitable) 
@@ -195,8 +208,9 @@ public:
         for (int i = 0; i < numberOfMoons; i++)
         {
             moon[i] = new Moon(*planet.moon[i]);
+            numberOfMoons++;
         }
-        printf("\nPlanet(const Planet& planet)");
+        printf("\nPlanet(const Planet& planet)\n");
     }
 
     virtual ~Planet()
@@ -216,5 +230,66 @@ public:
 
 int main()
 {
-    
+    setlocale(LC_ALL, "Russian");
+    {
+        printf("Статическое создание и использование и удаление объектов\n\n");
+        Planet Earth;
+        Earth.planetName = "Earth";
+        Earth.message();
+    }
+    {
+        printf("\nДинамическое создание, использование и удаление объектов\n\n");
+        Planet* Earth = new Planet(5.9726e24, 10.8321e11, 0.99726968, "MilkyWay", "SolarSystem", "Earth", true);
+        Earth->message();
+        Planet* Jupiter = new Planet(1.8986e27, 1.43128e15, 0.41, "MilkyWay", "SolarSystem", "Jupiter", false);
+        Jupiter->message();
+        Moon* theMoon = new Moon(7.3477e22, 2.1958, Earth->rotationPeriod, "Moon");
+        Earth->addMoon(*theMoon);
+
+        delete Earth;
+        delete Jupiter;
+        delete theMoon;
+    }
+    {
+        printf("\nСоздание и использование объектов с помощью различных конструкторов\n");
+        Planet* Mars = new Planet();
+        printf("\n\n");
+        Planet* Earth = new Planet(5.9726e24, 10.8321e11, 0.99726968, "MilkyWay", "SolarSystem", "Earth", true);
+        printf("\n\n");
+        Planet* Earth2 = new Planet(*Earth);
+
+        delete Mars;
+        delete Earth;
+        delete Earth2;
+    }
+    {
+        printf("\nПомещение объектов в переменные различных типов\n");
+        CelestialBody* Body = new CelestialBody(5000000, 17250000, 2.783);
+        CelestialBody* Earth = new Planet(5.9726e24, 10.8321e11, 0.99726968, "MilkyWay", "SolarSystem", "Earth", true);
+        CelestialBody* Jupiter = new Planet(1.8986e27, 1.43128e15, 0.41, "MilkyWay", "SolarSystem", "Jupiter", false);
+        CelestialBody* theMoon = new Moon(7.3477e22, 2.1958, Earth->rotationPeriod, "Moon");
+
+        Body->message();
+        Earth->message();
+        Jupiter->message();
+        theMoon->message();
+        
+        printf("\ndelete Body\n");
+        delete Body;
+        printf("\ndelete Earth\n");
+        delete Earth;
+        printf("\ndelete Jupiter\n");
+        delete Jupiter;
+        printf("\ndelete theMoon\n");
+        delete theMoon;
+    }
+    {
+        printf("\nКомпозиция объектов\n");
+        Planet* Earth = new Planet(5.9726e24, 10.8321e11, 0.99726968, "MilkyWay", "SolarSystem", "Earth", true);
+        Moon* theMoon = new Moon(7.3477e22, 2.1958, Earth->rotationPeriod, "Moon");
+        Earth->addMoon(*theMoon);
+
+        delete Earth;
+        delete theMoon;
+    }
 }
