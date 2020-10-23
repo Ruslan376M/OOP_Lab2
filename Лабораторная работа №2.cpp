@@ -131,6 +131,11 @@ public:
         printf("Moon()\n");
     }
 
+    void message()
+    {
+        printf("This body is а moon called %s\n", moonName.c_str());
+    }
+
     Moon(double mass, double volume, double rotationPeriod, std::string moonName)
         :CelestialBody(mass, volume, rotationPeriod)
     {
@@ -157,10 +162,15 @@ class Planet : public PlanetarySystem, public CelestialBody
 private:
     int numberOfMoons = 0;
 public:
-    Moon** moons = new Moon*[63];
+    Moon** moon = new Moon*[63];
     
     std::string planetName;
     bool canBeHabitable;// Пригодна ли для жизни
+
+    void message()
+    {
+        printf("This is а planet called %s\n", planetName.c_str());
+    }
 
     Planet()
     {
@@ -182,7 +192,22 @@ public:
     {
         this->planetName = planet.planetName;
         this->canBeHabitable;
+        for (int i = 0; i < numberOfMoons; i++)
+        {
+            moon[i] = new Moon(*planet.moon[i]);
+        }
         printf("\nPlanet(const Planet& planet)");
+    }
+
+    virtual ~Planet()
+    {
+        for (int i = 0; i < numberOfMoons; i++)
+        {
+            delete moon[i];
+        }
+        delete moon;
+        printf("%s\n", planetName.c_str());
+        printf("~Planet()\n");
     }
     
 };
